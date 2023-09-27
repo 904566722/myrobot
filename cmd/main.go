@@ -2,14 +2,21 @@ package main
 
 import (
 	"fmt"
-	"time"
 
-	"github.com/go-vgo/robotgo"
+	"github.com/spf13/cobra"
 )
 
+// 好的命令行程序应该遵守: APPNAME VERB NOUN --ADJECTIVE 或 APPNAME COMMAND ARG --FLAG
+// e.g.
+// ./myrobot mouse click --interval=1000
+
+var rootCmd = &cobra.Command{Use: "myrobot"}
+
 func main() {
-	time.Sleep(2 * time.Second)
-	fmt.Printf("获取鼠标位置中\n")
-	x, y := robotgo.Location()
-	fmt.Printf("鼠标位置:(%d,%d)\n", x, y)
+	rootCmd.AddCommand(CmdMouse) // 添加鼠标事件
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		return
+	}
 }
