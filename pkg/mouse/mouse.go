@@ -78,3 +78,19 @@ func clickWithInterval(interval int, clickEvt func()) {
 		time.Sleep(time.Duration(interval) * time.Millisecond)
 	}
 }
+
+// PressAndRelease 完成一次鼠标按下并释放的动作
+func PressAndRelease(key string, interval time.Duration) error {
+	t := time.NewTimer(interval)
+	defer t.Stop()
+	if err := robotgo.MouseDown(key); err != nil {
+		return err
+	}
+	select {
+	case <-t.C:
+		if err := robotgo.MouseUp(key); err != nil {
+			return err
+		}
+	}
+	return nil
+}

@@ -18,7 +18,9 @@ var (
 )
 
 func init() {
-	CmdKeyBoard.AddCommand(cmdLetter)
+	CmdKeyBoard.AddCommand(cmdTapLetter)
+	CmdKeyBoard.AddCommand(cmdPress)
+	CmdKeyBoard.AddCommand(cmdRelease)
 
 	CmdKeyBoard.PersistentFlags().IntVarP(&interval, "interval", "i", -1, "事件的时间间隔(毫秒)\n<=0 表示只键入一次")
 }
@@ -28,8 +30,8 @@ var CmdKeyBoard = &cobra.Command{
 	Short: "键盘相关事件",
 }
 
-var cmdLetter = &cobra.Command{
-	Use:   "letter",
+var cmdTapLetter = &cobra.Command{
+	Use:   "tap-letter",
 	Short: "键入字母",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 || len(args[0]) != 1 {
@@ -44,11 +46,31 @@ var cmdLetter = &cobra.Command{
 	},
 }
 
+var cmdPress = &cobra.Command{
+	Use:   "press",
+	Short: "按下某个按键",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 || len(args[0]) != 1 {
+			return ErrNotEqOneLetter
+		}
+		return robotgo.KeyDown(args[0])
+	},
+}
+
+var cmdRelease = &cobra.Command{
+	Use:   "release",
+	Short: "释放某个按键",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 || len(args[0]) != 1 {
+			return ErrNotEqOneLetter
+		}
+		return robotgo.KeyUp(args[0])
+	},
+}
+
 func keyTapWithInterval(interval int, evt func() error) error {
 	if interval <= 0 {
-		if err := evt(); err != nil {
-			return err
-		}
+		return evt()
 	}
 
 	for {
